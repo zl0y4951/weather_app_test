@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:weather_app_test/core/db/idatabase.dart';
 import 'package:weather_app_test/core/models/utils/chart_data.dart';
 import 'package:weather_app_test/core/models/weather_model.dart';
 import 'package:weather_app_test/core/services/database_provider.dart';
@@ -6,20 +7,21 @@ import 'package:weather_app_test/core/services/database_provider.dart';
 final historyScreenController = StateNotifierProvider.family<
     HistoryScreenNotifier, AsyncValue<List<WeatherModel>>, int>(
   (ref, id) {
-    return HistoryScreenNotifier(ref, id)..init();
+    final database = ref.read(databaseProvider);
+    return HistoryScreenNotifier(id, database)..init();
   },
 );
 
 class HistoryScreenNotifier
     extends StateNotifier<AsyncValue<List<WeatherModel>>> {
-  HistoryScreenNotifier(this._ref, this.id) : super(const AsyncLoading());
+  HistoryScreenNotifier(this.id, this.database) : super(const AsyncLoading());
   final int id;
-  final StateNotifierProviderRef _ref;
+  final IDatabase database;
 
   ({
-    ChartData<DateTime, double> temp,
-    ChartData<DateTime, int> humidity,
-    ChartData<DateTime, int> pressure
+    ChartData<DateTime, num> temp,
+    ChartData<DateTime, num> humidity,
+    ChartData<DateTime, num> pressure
   }) getChartData() {
     if (!mounted || state.value == null) {
       return const (
@@ -29,15 +31,15 @@ class HistoryScreenNotifier
       );
     }
     final data = state.value!;
-    final Map<DateTime, double> temp = {};
-    final Map<DateTime, int> humidity = {};
-    final Map<DateTime, int> pressure = {};
-    double tempMax = 0;
-    double tempMin = double.maxFinite;
-    int humidityMin = -1 >>> 1;
-    int humidityMax = 0;
-    int pressureMin = -1 >>> 1;
-    int pressureMax = 0;
+    final Map<DateTime, num> temp = {};
+    final Map<DateTime, num> humidity = {};
+    final Map<DateTime, num> pressure = {};
+    num tempMax = 0;
+    num tempMin = double.maxFinite;
+    num humidityMin = -1 >>> 1;
+    num humidityMax = 0;
+    num pressureMin = -1 >>> 1;
+    num pressureMax = 0;
 
     for (var weather in data) {
       temp.addAll({weather.dt: weather.temp});
@@ -74,8 +76,7 @@ class HistoryScreenNotifier
   }
 
   Future<void> init() async {
-    final db = _ref.read(databaseProvider);
-    final list = await db.getWeatherHistory(id);
+    final list = await database.getWeatherHistory(id);
     state = AsyncData(list);
   }
 }

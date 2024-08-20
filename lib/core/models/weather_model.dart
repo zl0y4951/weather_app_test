@@ -7,9 +7,9 @@ import 'package:weather_app_test/core/models/wind_model.dart';
 
 class WeatherModel {
   final DateTime dt;
-  final double temp;
-  final int? pressure;
-  final int? humidity;
+  final num temp;
+  final num? pressure;
+  final num? humidity;
   final String weather;
   final WindModel? wind;
   const WeatherModel({
@@ -23,9 +23,9 @@ class WeatherModel {
 
   WeatherModel copyWith({
     DateTime? dt,
-    double? temp,
-    int? pressure,
-    int? humidity,
+    num? temp,
+    num? pressure,
+    num? humidity,
     String? weather,
     WindModel? wind,
   }) {
@@ -52,9 +52,9 @@ class WeatherModel {
   factory WeatherModel.fromMap(Map<String, dynamic> map) {
     return WeatherModel(
       dt: DateTime.fromMillisecondsSinceEpoch((map['dt'] as int) * 1000),
-      temp: map['main']['temp'] as double,
-      pressure: map['main']['pressure'] as int?,
-      humidity: map['main']['humidity'] as int?,
+      temp: map['main']['temp'],
+      pressure: map['main']['pressure'],
+      humidity: map['main']['humidity'],
       weather: (map['weather']?.first['main'] ?? 'clear') as String,
       wind: map['wind'] != null
           ? WindModel.fromMap(map['wind'] as Map<String, dynamic>)

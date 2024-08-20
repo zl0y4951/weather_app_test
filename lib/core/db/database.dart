@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
+import 'package:weather_app_test/core/db/idatabase.dart';
 import 'package:weather_app_test/core/models/city_model.dart';
 import 'package:weather_app_test/core/models/daily_weather_model.dart';
 import 'package:weather_app_test/core/models/search/coordinates.dart';
@@ -35,12 +36,13 @@ class CityTable extends Table {
 }
 
 @DriftDatabase(tables: [CityTable, WeatherTable])
-class Database extends _$Database {
+class Database extends _$Database implements IDatabase {
   Database() : super(_openConnection());
 
   @override
   int get schemaVersion => 1;
 
+  @override
   Future<int> getOrAddCity(CityModel cityModel) async {
     final city = await (select(cityTable)
           ..where((tbl) => tbl.id.equals(cityModel.id)))
@@ -58,6 +60,7 @@ class Database extends _$Database {
     }
   }
 
+  @override
   Future<DailyWeatherModel?> getWeatherForCurrentTime(Coords coords) async {
     final now = DateTime.now();
 
@@ -100,6 +103,7 @@ class Database extends _$Database {
     return null;
   }
 
+  @override
   Future<List<WeatherModel>> getWeatherHistory(int cityId) async {
     final weatherHistory = await (select(weatherTable)
           ..where((tbl) => tbl.city.equals(cityId))
@@ -112,6 +116,7 @@ class Database extends _$Database {
     return weatherHistory.map((e) => WeatherModel.fromEntry(e)).toList();
   }
 
+  @override
   Future<void> insertWeatherDataBatch(
       List<WeatherModel> weatherModels, CityModel cityModel) async {
     final cityId = await getOrAddCity(cityModel);
@@ -126,9 +131,9 @@ class Database extends _$Database {
 
         if (existingWeather == null) {
           final weatherCompanion = WeatherTableCompanion(
-            temp: Value(weatherModel.temp),
-            humidity: Value(weatherModel.humidity),
-            pressure: Value(weatherModel.pressure),
+            temp: Value(weatherModel.temp.toDouble()),
+            humidity: Value(weatherModel.humidity?.toInt()),
+            pressure: Value(weatherModel.pressure?.toInt()),
             datetime: Value(weatherModel.dt),
             sunrise: Value(cityModel.sunrise),
             sunset: Value(cityModel.sunset),

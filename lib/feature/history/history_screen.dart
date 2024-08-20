@@ -29,18 +29,17 @@ class HistoryScreen extends ConsumerWidget {
               const Padding(
                   padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                   child: Text('Температура, °')),
-              SizedBox(
-                  height: 200, child: _LineChart<double>(data: flData.temp)),
+              SizedBox(height: 200, child: _LineChart<num>(data: flData.temp)),
               const Padding(
                   padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                   child: Text('Влажность, %:')),
               SizedBox(
-                  height: 200, child: _LineChart<int>(data: flData.humidity)),
+                  height: 200, child: _LineChart<num>(data: flData.humidity)),
               const Padding(
                   padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                   child: Text('Давление, мм. рт. ст.:')),
               SizedBox(
-                  height: 200, child: _LineChart<int>(data: flData.pressure))
+                  height: 200, child: _LineChart<num>(data: flData.pressure))
             ],
           );
         },

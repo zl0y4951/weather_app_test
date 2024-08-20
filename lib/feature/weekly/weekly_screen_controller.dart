@@ -5,19 +5,21 @@ import 'package:weather_app_test/core/models/weather_model.dart';
 final weeklyScreenController = StateNotifierProvider.family<
     WeeklyScreenNotifier, AsyncValue<List<WeatherModel>>, (double, double)>(
   (ref, coords) {
-    return WeeklyScreenNotifier(ref, coords)..init();
+    final weatherRep = ref.read(weatherServiceProvider);
+    return WeeklyScreenNotifier(coords, weatherRep)..init();
   },
 );
 
 class WeeklyScreenNotifier
     extends StateNotifier<AsyncValue<List<WeatherModel>>> {
-  WeeklyScreenNotifier(this._ref, this.coords) : super(const AsyncLoading());
+  WeeklyScreenNotifier(this.coords, this._weatherRepository)
+      : super(const AsyncLoading());
   final (double lat, double lon) coords;
-  final StateNotifierProviderRef _ref;
+
+  final WeatherRepository _weatherRepository;
 
   Future<void> init() async {
-    final weatherList =
-        await _ref.read(weatherServiceProvider).weekly(coords.$1, coords.$2);
+    final weatherList = await _weatherRepository.weekly(coords.$1, coords.$2);
     state = AsyncData(weatherList);
   }
 }

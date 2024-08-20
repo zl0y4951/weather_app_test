@@ -31,7 +31,8 @@ class GeocodingRepository implements IGeocodingRepository {
       } else {
         return [];
       }
-    } on Object {
+    } on Object catch (e) {
+      print(e);
       rethrow;
     }
   }
